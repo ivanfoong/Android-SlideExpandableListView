@@ -173,7 +173,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 					if (type == ExpandCollapseAnimation.EXPAND) {
 						if (lastOpenPosition != -1 && lastOpenPosition != position) {
 							if (lastOpen != null) {
-								animateView(lastOpen, ExpandCollapseAnimation.COLLAPSE);
+                                collapseView(lastOpen);
 							}
 							openItems.set(lastOpenPosition, false);
 						}
@@ -234,6 +234,14 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 		}
 		return false;
 	}
+
+    public void collapseView(View view) {
+        if (view != null) {
+            LinearLayout.LayoutParams LayoutParams = ((LinearLayout.LayoutParams) view.getLayoutParams());
+            LayoutParams.bottomMargin = 0;
+            view.requestLayout();
+        }
+    }
 
 	public Parcelable onSaveInstanceState(Parcelable parcelable) {
 
