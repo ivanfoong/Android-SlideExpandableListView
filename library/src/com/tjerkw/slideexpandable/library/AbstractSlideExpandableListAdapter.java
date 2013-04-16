@@ -1,13 +1,16 @@
 package com.tjerkw.slideexpandable.library;
 
+import android.graphics.Rect;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.SparseIntArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 
 import java.util.BitSet;
 
@@ -47,6 +50,8 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	 */
 	private final SparseIntArray viewHeights = new SparseIntArray(10);
 
+    private ViewGroup parent;
+
 	public AbstractSlideExpandableListAdapter(ListAdapter wrapped) {
 		super(wrapped);
 	}
@@ -54,6 +59,7 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		view = wrapped.getView(position, view, viewGroup);
+        this.parent = viewGroup;
 		enableFor(view, position);
 		return view;
 	}
@@ -212,6 +218,37 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
 				type
 		);
 		anim.setDuration(getAnimationDuration());
+        anim.setAnimationListener(new Animation.AnimationListener() {
+
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if (type == ExpandCollapseAnimation.EXPAND) {
+                    if (parent instanceof GridView) {
+                        GridView gridView = (GridView) parent;
+                        // To scroll abit beyond item to scroll off previous item to update collapse state
+                        int movement = ((View)target.getParent()).getTop() + 2;
+                        Rect r = new Rect();
+                        boolean visible = target.getGlobalVisibleRect(r);
+                        Rect r2 = new Rect();
+                        gridView.getGlobalVisibleRect(r2);
+                        if (!visible) {
+                            gridView.smoothScrollBy(movement, 1000);
+                        } else {
+                            if (r2.bottom == r.bottom) {
+                                gridView.smoothScrollBy(movement, 1000);
+                            }
+                        }
+                    }
+                }
+
+            }
+        });
 		target.startAnimation(anim);
 	}
 
