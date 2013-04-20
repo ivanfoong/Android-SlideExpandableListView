@@ -239,10 +239,6 @@ public abstract class AbstractSlideExpandableListAdapter extends WrapperListAdap
                         gridView.getGlobalVisibleRect(r2);
                         if (!visible) {
                             gridView.smoothScrollBy(movement, 1000);
-                        } else {
-                            if (r2.bottom == r.bottom) {
-                                gridView.smoothScrollBy(movement, 1000);
-                            }
                         }
                     }
                 }
